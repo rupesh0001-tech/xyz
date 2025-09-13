@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building2, Heart, ArrowRight } from "lucide-react";
+import { Link } from "wouter";
 
 interface UserTypeSelectorProps {
   onSelectType: (type: "provider" | "ngo") => void;
@@ -21,10 +22,10 @@ export default function UserTypeSelector({ onSelectType }: UserTypeSelectorProps
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Food Provider Card */}
-          <Card className="hover-elevate cursor-pointer group" onClick={() => onSelectType("provider")}>
+          <Card className="hover-elevate cursor-pointer group">
             <CardContent className="p-8 text-center">
-              <div className="bg-primary/10 rounded-full p-6 w-20 h-20 mx-auto mb-6 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <Building2 className="w-10 h-10 text-primary" />
+              <div className="bg-green-100 rounded-full p-6 w-20 h-20 mx-auto mb-6 flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                <Building2 className="w-10 h-10 text-green-600" />
               </div>
               
               <h3 className="text-xl font-semibold text-foreground mb-3">Food Provider</h3>
@@ -35,42 +36,40 @@ export default function UserTypeSelector({ onSelectType }: UserTypeSelectorProps
               
               <ul className="text-sm text-muted-foreground space-y-2 mb-6 text-left">
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-1.5 h-1.5 bg-green-600 rounded-full mt-2 flex-shrink-0"></div>
                   Register surplus food quickly
                 </li>
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-1.5 h-1.5 bg-green-600 rounded-full mt-2 flex-shrink-0"></div>
                   Connect directly with NGOs
                 </li>
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-1.5 h-1.5 bg-green-600 rounded-full mt-2 flex-shrink-0"></div>
                   Reduce waste and help communities
                 </li>
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-1.5 h-1.5 bg-green-600 rounded-full mt-2 flex-shrink-0"></div>
                   Track your social impact
                 </li>
               </ul>
 
-              <Button 
-                className="w-full group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelectType("provider");
-                }}
-                data-testid="button-select-provider"
-              >
-                I'm a Food Provider
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              <Link href="/provider-login">
+                <Button 
+                  className="w-full group bg-green-600 hover:bg-green-700"
+                  data-testid="button-select-provider"
+                >
+                  I'm a Food Provider
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
           {/* NGO Card */}
-          <Card className="hover-elevate cursor-pointer group" onClick={() => onSelectType("ngo")}>
+          <Card className="hover-elevate cursor-pointer group">
             <CardContent className="p-8 text-center">
-              <div className="bg-primary/10 rounded-full p-6 w-20 h-20 mx-auto mb-6 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <Heart className="w-10 h-10 text-primary" />
+              <div className="bg-blue-100 rounded-full p-6 w-20 h-20 mx-auto mb-6 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                <Heart className="w-10 h-10 text-blue-600" />
               </div>
               
               <h3 className="text-xl font-semibold text-foreground mb-3">NGO / Charity</h3>
@@ -81,34 +80,32 @@ export default function UserTypeSelector({ onSelectType }: UserTypeSelectorProps
               
               <ul className="text-sm text-muted-foreground space-y-2 mb-6 text-left">
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
                   Find available food donations
                 </li>
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
                   Coordinate pickup and distribution
                 </li>
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
                   Serve more community members
                 </li>
                 <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
                   Build partnerships with providers
                 </li>
               </ul>
 
-              <Button 
-                className="w-full group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelectType("ngo");
-                }}
-                data-testid="button-select-ngo"
-              >
-                I'm an NGO
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              <Link href="/ngo-login">
+                <Button 
+                  className="w-full group bg-blue-600 hover:bg-blue-700"
+                  data-testid="button-select-ngo"
+                >
+                  I'm an NGO
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
