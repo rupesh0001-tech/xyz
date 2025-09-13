@@ -12,7 +12,7 @@ import FoodWasteAwareness from "@/components/FoodWasteAwareness";
 import FeaturesSection from "@/components/FeaturesSection";
 import CommunityImpact from "@/components/CommunityImpact";
 import { useAuth } from "@/hooks/useAuth";
-import { useCreateFoodListing } from "@/hooks/useFoodListings";
+import { useCreateFoodListing, useClaimFoodListing } from "@/hooks/useFoodListings";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
@@ -20,6 +20,7 @@ export default function Home() {
   const { user, login, register, logout } = useAuth();
   const { toast } = useToast();
   const createFoodListingMutation = useCreateFoodListing();
+  const claimFoodListingMutation = useClaimFoodListing();
   
   // UI state
   const [currentView, setCurrentView] = useState<"home" | "register-food" | "dashboard" | "provider-dashboard">("home");
@@ -150,10 +151,35 @@ export default function Home() {
     setIsChatOpen(true);
   };
 
-  const handleClaimListing = (listingId: string) => {
-    console.log("Claiming listing:", listingId);
-    alert("Listing claimed! The provider has been notified and you can now coordinate pickup.");
-    // In a real app, this would update the listing status and notify the provider
+  const handleClaimListing = async (listingId: string) => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    if (user.userType !== "ngo") {
+      toast({
+        title: "Access Denied",
+        description: "Only NGOs can claim food listings.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!user.isVerified) {
+      toast({
+        title: "Verification Required",
+        description: "Your NGO account must be verified before you can claim listings.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await claimFoodListingMutation.mutateAsync(listingId);
+    } catch (error) {
+      // Error handling is done in the mutation hook
+    }
   };
 
   const renderCurrentView = () => {

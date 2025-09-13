@@ -129,3 +129,38 @@ export function useUpdateFoodListingStatus() {
     },
   });
 }
+
+export function useClaimFoodListing() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: (listingId: string) => 
+      fetch(`/api/food-listings/${listingId}/claim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      }).then(async res => {
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.error || 'Failed to claim listing');
+        }
+        return res.json();
+      }),
+    onSuccess: (data) => {
+      // Invalidate all food listings queries to refresh both NGO and Provider dashboards
+      queryClient.invalidateQueries({ queryKey: ['food-listings'] });
+      toast({
+        title: "Listing Claimed!",
+        description: "You have successfully claimed this listing. The provider has been notified and you can now coordinate pickup.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Unable to Claim",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}
