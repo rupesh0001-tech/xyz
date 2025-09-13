@@ -7,6 +7,10 @@ import NGODashboard from "@/components/NGODashboard";
 import ProviderDashboard from "@/components/ProviderDashboard";
 import ChatInterface from "@/components/ChatInterface";
 import AuthModal from "@/components/AuthModal";
+import Footer from "@/components/Footer";
+import FoodWasteAwareness from "@/components/FoodWasteAwareness";
+import FeaturesSection from "@/components/FeaturesSection";
+import CommunityImpact from "@/components/CommunityImpact";
 import { useAuth } from "@/hooks/useAuth";
 import { useCreateFoodListing } from "@/hooks/useFoodListings";
 import { useToast } from "@/hooks/use-toast";
@@ -216,9 +220,20 @@ export default function Home() {
               }}
               userType={user?.userType || null}
             />
-            <div id="user-type-selector">
-              <UserTypeSelector onSelectType={handleUserTypeSelection} />
-            </div>
+            {!user && (
+              <div id="user-type-selector">
+                <UserTypeSelector onSelectType={handleUserTypeSelection} />
+              </div>
+            )}
+            
+            {/* Food Waste Impact Content */}
+            <FoodWasteAwareness />
+            
+            {/* Statistics and Features */}
+            <FeaturesSection />
+            
+            {/* Community Impact */}
+            <CommunityImpact />
           </>
         );
     }
@@ -234,6 +249,9 @@ export default function Home() {
       />
 
       {renderCurrentView()}
+
+      {/* Footer - only show on home view */}
+      {currentView === "home" && <Footer />}
 
       {/* Chat Interface */}
       {currentChatData && user && (
