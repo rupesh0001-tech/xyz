@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { UserCircle, Menu, X, Heart, LogOut, Shield } from "lucide-react";
 
 interface User {
@@ -20,6 +21,13 @@ interface NavigationProps {
 
 export default function Navigation({ user, onAuthClick, onLogout }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const handleLogoutConfirm = () => {
+    onLogout();
+    setShowLogoutConfirm(false);
+    setIsMenuOpen(false);
+  };
 
   return (
     <nav className="bg-background border-b border-border sticky top-0 z-50">
@@ -59,15 +67,32 @@ export default function Navigation({ user, onAuthClick, onLogout }: NavigationPr
                 <span className="text-sm text-muted-foreground">
                   {user.name}
                 </span>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={onLogout}
-                  data-testid="button-logout"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      data-testid="button-logout"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to logout? You'll need to sign in again to access your account.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>No, Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleLogoutConfirm}>
+                        Yes, Logout
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </>
             )}
             {!user && (
@@ -126,18 +151,32 @@ export default function Navigation({ user, onAuthClick, onLogout }: NavigationPr
                       Admin Panel
                     </Button>
                   )}
-                  <Button 
-                    variant="outline" 
-                    className="justify-start"
-                    onClick={() => {
-                      onLogout();
-                      setIsMenuOpen(false);
-                    }}
-                    data-testid="button-logout-mobile"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="justify-start"
+                        data-testid="button-logout-mobile"
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Logout
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to logout? You'll need to sign in again to access your account.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>No, Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleLogoutConfirm}>
+                          Yes, Logout
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </>
               )}
               {!user && (
