@@ -3,6 +3,7 @@ import { pgTable, text, varchar, timestamp, pgEnum, integer, boolean } from "dri
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+
 // User types enum
 export const userTypeEnum = pgEnum('user_type', ['provider', 'ngo']);
 export const urgencyEnum = pgEnum('urgency', ['low', 'medium', 'high']);
