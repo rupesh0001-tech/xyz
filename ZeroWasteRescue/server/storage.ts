@@ -92,7 +92,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Food listing methods
-  async getFoodListings(filters?: { location?: string; urgency?: string; foodType?: string; providerId?: string }): Promise<FoodListing[]> {
+  async getFoodListings(filters?: { location?: string; urgency?: string; foodType?: string; providerId?: string }): Promise<any[]> {
     let whereConditions = [eq(foodListings.isActive, 1)];
     
     if (filters?.location) {
@@ -108,8 +108,27 @@ export class DatabaseStorage implements IStorage {
       whereConditions.push(eq(foodListings.providerId, filters.providerId));
     }
     
-    return db.select()
+    // Join with users table to get claimed NGO name
+    return db.select({
+      id: foodListings.id,
+      title: foodListings.title,
+      description: foodListings.description,
+      quantity: foodListings.quantity,
+      location: foodListings.location,
+      foodType: foodListings.foodType,
+      urgency: foodListings.urgency,
+      expiresIn: foodListings.expiresIn,
+      providerId: foodListings.providerId,
+      claimedByNgoId: foodListings.claimedByNgoId,
+      claimStatus: foodListings.claimStatus,
+      claimedAt: foodListings.claimedAt,
+      createdAt: foodListings.createdAt,
+      updatedAt: foodListings.updatedAt,
+      isActive: foodListings.isActive,
+      claimedByNgoName: users.name
+    })
       .from(foodListings)
+      .leftJoin(users, eq(foodListings.claimedByNgoId, users.id))
       .where(and(...whereConditions))
       .orderBy(desc(foodListings.createdAt));
   }
