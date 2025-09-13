@@ -113,12 +113,6 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister, initia
               </Button>
             </form>
 
-            <div className="text-center text-sm text-muted-foreground">
-              Forgot your password?{" "}
-              <Button variant="ghost" className="p-0 h-auto text-primary underline" data-testid="link-forgot-password">
-                Reset it here
-              </Button>
-            </div>
           </TabsContent>
 
           <TabsContent value="register" className="space-y-4 max-h-96 overflow-y-auto">

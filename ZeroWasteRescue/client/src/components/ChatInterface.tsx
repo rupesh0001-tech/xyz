@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Send, X, Phone, MapPin, Loader2 } from "lucide-react";
+import { Send, X, Loader2 } from "lucide-react";
 import { messagesApi } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -139,12 +139,6 @@ export default function ChatInterface({
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" size="icon" data-testid="button-call">
-              <Phone className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="icon" data-testid="button-location">
-              <MapPin className="w-4 h-4" />
-            </Button>
             <Button variant="ghost" size="icon" onClick={onClose} data-testid="button-close-chat">
               <X className="w-4 h-4" />
             </Button>
