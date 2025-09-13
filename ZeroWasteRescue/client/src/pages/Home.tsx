@@ -134,18 +134,28 @@ export default function Home() {
       return;
     }
 
+    // Validate required data
+    if (!listing?.id || !provider?.id) {
+      toast({
+        title: "Error",
+        description: "Unable to start chat - missing required information",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setCurrentChatData({
       listing: {
         id: listing.id,
-        title: listing.title,
+        title: listing.title || "Food Listing",
         provider: {
           id: provider.id,
-          name: provider.name
+          name: provider.name || "Food Provider"
         }
       },
       otherUser: {
         id: provider.id,
-        name: provider.name
+        name: provider.name || "Food Provider"
       }
     });
     setIsChatOpen(true);

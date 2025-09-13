@@ -67,11 +67,17 @@ export default function ChatInterface({
   }, [messages]);
 
   const loadMessages = async () => {
+    if (!listing?.id || !otherUser?.id) {
+      console.error("Missing listing or user data for loading messages");
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await messagesApi.getByListing(listing.id, otherUser.id) as Message[];
       setMessages(response);
     } catch (error: any) {
+      console.error("Load messages error:", error);
       toast({
         title: "Error",
         description: "Failed to load messages",
@@ -85,6 +91,16 @@ export default function ChatInterface({
   const handleSendMessage = async () => {
     if (!newMessage.trim() || sending) return;
 
+    // Validate required data before sending
+    if (!otherUser?.id || !listing?.id) {
+      toast({
+        title: "Error",
+        description: "Unable to send message - missing chat information",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSending(true);
     try {
       const messageData = {
@@ -97,9 +113,10 @@ export default function ChatInterface({
       setMessages(prev => [...prev, newMsg]);
       setNewMessage("");
     } catch (error: any) {
+      console.error("Message send error:", error);
       toast({
         title: "Error",
-        description: "Failed to send message",
+        description: error.message || "Failed to send message",
         variant: "destructive",
       });
     } finally {
