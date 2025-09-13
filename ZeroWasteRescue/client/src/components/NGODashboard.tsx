@@ -194,7 +194,10 @@ export default function NGODashboard({ onContactProvider, onClaimListing }: NGOD
             <FoodListingCard
               key={listing.id}
               listing={listing}
-              onContact={(id: string) => onContactProvider(listing, { name: listing.provider })}
+              onContact={(id: string) => onContactProvider(listing, { 
+                id: listing.providerId, 
+                name: listing.provider || "Food Provider" 
+              })}
               onClaim={onClaimListing}
               onStatusUpdate={handleStatusUpdate}
               userType="ngo"
