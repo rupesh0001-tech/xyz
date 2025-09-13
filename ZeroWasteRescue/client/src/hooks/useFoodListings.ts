@@ -94,3 +94,38 @@ export function useDeleteFoodListing() {
     },
   });
 }
+
+export function useUpdateFoodListingStatus() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) => 
+      fetch(`/api/food-listings/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ claimStatus: status })
+      }).then(async res => {
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.error || 'Failed to update status');
+        }
+        return res.json();
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['food-listings'] });
+      toast({
+        title: "Status Updated!",
+        description: "Food listing status updated successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}

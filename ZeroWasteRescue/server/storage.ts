@@ -19,6 +19,7 @@ export interface IStorage {
   getFoodListing(id: string): Promise<FoodListing | undefined>;
   createFoodListing(listing: InsertFoodListing): Promise<FoodListing>;
   updateFoodListing(id: string, updates: Partial<InsertFoodListing>): Promise<FoodListing | undefined>;
+  updateFoodListingStatus(id: string, status: string): Promise<FoodListing | undefined>;
   deleteFoodListing(id: string): Promise<boolean>;
   claimFoodListing(id: string, ngoId: string): Promise<FoodListing | undefined>;
   unclaimFoodListing(id: string): Promise<FoodListing | undefined>;
@@ -169,6 +170,18 @@ export class DatabaseStorage implements IStorage {
         claimedByNgoId: null,
         claimStatus: 'open',
         claimedAt: null,
+        updatedAt: new Date() 
+      })
+      .where(eq(foodListings.id, id))
+      .returning();
+    return listing || undefined;
+  }
+
+  async updateFoodListingStatus(id: string, status: string): Promise<FoodListing | undefined> {
+    const [listing] = await db
+      .update(foodListings)
+      .set({ 
+        claimStatus: status as any,
         updatedAt: new Date() 
       })
       .where(eq(foodListings.id, id))

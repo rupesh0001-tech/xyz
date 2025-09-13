@@ -6,8 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, Filter, MapPin, Clock } from "lucide-react";
 import FoodListingCard, { type FoodListing } from "./FoodListingCard";
-import { useFoodListings } from "@/hooks/useFoodListings";
+import { useFoodListings, useUpdateFoodListingStatus } from "@/hooks/useFoodListings";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/hooks/useAuth";
 
 // Helper function to convert backend listings to FoodListing format
 const convertToFoodListing = (listing: any): FoodListing => ({
@@ -20,7 +21,10 @@ const convertToFoodListing = (listing: any): FoodListing => ({
   timePosted: new Date(listing.createdAt).toLocaleDateString() + " ago", // Simplified
   expiresIn: listing.expiresIn,
   urgency: listing.urgency as "low" | "medium" | "high",
-  type: listing.foodType
+  type: listing.foodType,
+  claimStatus: listing.claimStatus,
+  claimedByNgoId: listing.claimedByNgoId,
+  providerId: listing.providerId
 });
 
 interface NGODashboardProps {
@@ -29,10 +33,16 @@ interface NGODashboardProps {
 }
 
 export default function NGODashboard({ onContactProvider, onClaimListing }: NGODashboardProps) {
+  const { user } = useAuth();
+  const updateStatusMutation = useUpdateFoodListingStatus();
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [urgencyFilter, setUrgencyFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+
+  const handleStatusUpdate = async (id: string, status: string) => {
+    await updateStatusMutation.mutateAsync({ id, status });
+  };
 
   // Get listings from API
   const { data: apiListings, isLoading } = useFoodListings({
@@ -42,8 +52,8 @@ export default function NGODashboard({ onContactProvider, onClaimListing }: NGOD
   });
 
   // Convert and filter listings
-  const listings = (apiListings || []).map(convertToFoodListing);
-  const filteredListings = listings.filter(listing => {
+  const listings = (Array.isArray(apiListings) ? apiListings : []).map((listing: any) => convertToFoodListing(listing));
+  const filteredListings = listings.filter((listing: FoodListing) => {
     const matchesSearch = listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          listing.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          listing.provider.toLowerCase().includes(searchTerm.toLowerCase());
@@ -180,13 +190,15 @@ export default function NGODashboard({ onContactProvider, onClaimListing }: NGOD
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredListings.map((listing) => (
+          {filteredListings.map((listing: FoodListing) => (
             <FoodListingCard
               key={listing.id}
               listing={listing}
-              onContact={onContactProvider}
+              onContact={(id: string) => onContactProvider(listing, { name: listing.provider })}
               onClaim={onClaimListing}
+              onStatusUpdate={handleStatusUpdate}
               userType="ngo"
+              currentUserId={user?.id}
             />
           ))}
         </div>

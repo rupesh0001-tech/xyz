@@ -6,7 +6,16 @@ import { z } from "zod";
 // User types enum
 export const userTypeEnum = pgEnum('user_type', ['provider', 'ngo']);
 export const urgencyEnum = pgEnum('urgency', ['low', 'medium', 'high']);
-export const claimStatusEnum = pgEnum('claim_status', ['open', 'claimed', 'collected', 'cancelled']);
+export const claimStatusEnum = pgEnum('claim_status', [
+  'open', 
+  'claimed', 
+  'confirmed',
+  'in_process', 
+  'delivery_partner_assigned', 
+  'in_transit', 
+  'completed', 
+  'cancelled'
+]);
 
 // Users table
 export const users = pgTable("users", {

@@ -102,14 +102,16 @@ export default function ProviderDashboard({
   };
 
   // Filter listings based on search
-  const filteredListings = (apiListings || []).filter((listing: any) =>
+  const filteredListings = (Array.isArray(apiListings) ? apiListings : []).filter((listing: any) =>
     listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     listing.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // FIX: Use correct claimStatus field instead of status
-  const activeListings = filteredListings.filter((listing: any) => listing.claimStatus !== 'claimed');
-  const claimedListings = filteredListings.filter((listing: any) => listing.claimStatus === 'claimed');
+  // Enhanced filtering for new status options
+  const activeListings = filteredListings.filter((listing: any) => listing.claimStatus === 'open');
+  const claimedListings = filteredListings.filter((listing: any) => 
+    listing.claimStatus !== 'open' && listing.claimStatus !== 'cancelled'
+  );
 
   if (isLoading) {
     return (
@@ -127,7 +129,7 @@ export default function ProviderDashboard({
     );
   }
 
-  const ListingCard = ({ listing }: { listing: any }) => (
+  const ListingCard = ({ listing }: { listing: any }): JSX.Element => (
     <Card>
       <CardHeader>
         <div className="flex items-start justify-between">
@@ -142,8 +144,22 @@ export default function ProviderDashboard({
                            listing.urgency === 'medium' ? 'default' : 'secondary'}>
               {listing.urgency} priority
             </Badge>
-            {listing.claimStatus === 'claimed' && (
-              <Badge variant="outline">Claimed</Badge>
+            {listing.claimStatus !== 'open' && (
+              <Badge variant={
+                listing.claimStatus === 'completed' ? 'default' :
+                listing.claimStatus === 'cancelled' ? 'destructive' :
+                listing.claimStatus === 'in_transit' ? 'secondary' :
+                'outline'
+              }>
+                {listing.claimStatus === 'claimed' ? 'Claimed' :
+                 listing.claimStatus === 'confirmed' ? 'Confirmed' :
+                 listing.claimStatus === 'in_process' ? 'In Process' :
+                 listing.claimStatus === 'delivery_partner_assigned' ? 'Driver Assigned' :
+                 listing.claimStatus === 'in_transit' ? 'In Transit' :
+                 listing.claimStatus === 'completed' ? 'Completed' :
+                 listing.claimStatus === 'cancelled' ? 'Cancelled' :
+                 listing.claimStatus}
+              </Badge>
             )}
           </div>
         </div>
@@ -166,6 +182,21 @@ export default function ProviderDashboard({
           </div>
         </div>
 
+        {/* Status Timeline for claimed listings */}
+        {listing.claimStatus !== 'open' && listing.claimedByNgoId && (
+          <div className="mb-4 p-3 bg-muted rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="font-medium text-sm">NGO:</span>
+              <span className="text-sm">{listing.claimedByNgoName || 'Claimed NGO'}</span>
+            </div>
+            {listing.claimedAt && (
+              <div className="text-xs text-muted-foreground">
+                Claimed: {new Date(listing.claimedAt).toLocaleDateString()} at {new Date(listing.claimedAt).toLocaleTimeString()}
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex gap-2 pt-4 border-t">
           <Button
             variant="outline"
@@ -178,7 +209,7 @@ export default function ProviderDashboard({
             Messages {listing.claimedByNgoId ? "" : "(No NGO yet)"}
           </Button>
           
-          {listing.claimStatus !== 'claimed' && (
+          {listing.claimStatus === 'open' && (
             <>
               <Button
                 variant="outline"

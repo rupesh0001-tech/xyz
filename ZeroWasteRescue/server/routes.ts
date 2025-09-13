@@ -79,7 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.createUser({
         ...userData,
         password: hashedPassword,
-        isAdmin
+        ...(isAdmin && { isAdmin })
       });
       
       // Set session
@@ -304,6 +304,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const unclaimedListing = await storage.unclaimFoodListing(listingId);
       res.json({ message: "Listing unclaimed successfully", listing: unclaimedListing });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Status update route for claimed listings
+  app.patch("/api/food-listings/:id/status", requireAuth, async (req, res) => {
+    try {
+      const userId = (req as any).session.userId;
+      const listingId = req.params.id;
+      const { claimStatus } = req.body;
+      
+      // Define valid status transitions
+      const statusTransitions: Record<string, string[]> = {
+        'claimed': ['confirmed', 'cancelled'],
+        'confirmed': ['in_process', 'cancelled'],
+        'in_process': ['delivery_partner_assigned', 'in_transit', 'cancelled'],
+        'delivery_partner_assigned': ['in_transit', 'cancelled'],
+        'in_transit': ['completed'],
+        'completed': [], // Terminal state
+        'cancelled': []  // Terminal state
+      };
+      
+      // Get the listing to check authorization and current status
+      const listing = await storage.getFoodListing(listingId);
+      if (!listing) {
+        return res.status(404).json({ error: "Listing not found" });
+      }
+      
+      // Only the NGO who claimed it can update status (or admin)
+      const user = await storage.getUser(userId);
+      if (!user?.isAdmin && listing.claimedByNgoId !== userId) {
+        return res.status(403).json({ error: "Not authorized to update status for this listing" });
+      }
+      
+      // Validate status transition
+      const currentStatus = listing.claimStatus || 'open';
+      const allowedNextStatuses = statusTransitions[currentStatus] || [];
+      
+      if (!allowedNextStatuses.includes(claimStatus)) {
+        return res.status(400).json({ 
+          error: `Invalid status transition from '${currentStatus}' to '${claimStatus}'. Allowed transitions: ${allowedNextStatuses.join(', ')}` 
+        });
+      }
+      
+      // Update the status
+      const updatedListing = await storage.updateFoodListingStatus(listingId, claimStatus);
+      if (!updatedListing) {
+        return res.status(400).json({ error: "Unable to update listing status" });
+      }
+      
+      res.json({ message: "Status updated successfully", listing: updatedListing });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
